@@ -3,41 +3,36 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use DB;
+
 
 class TweetController extends Controller
 {
-    private $tweets = [
-        [
-            'author' => 'Oguzhan Akbulut',
-            'content' => 'This is my first tweet'
-        ],
-        [
-            'author' => 'Oguzhan Akbulut',
-            'content' => 'This is my second tweet'
-        ],
-        [
-            'author' => 'Oguzhan Akbulut',
-            'content' => 'This is my third tweet'
-        ],
-        [
-            'author' => 'John',
-            'content' => 'This is my first tweet'
-        ],
-        [
-            'author' => 'John',
-            'content' => 'This is my second tweet'
-        ],
-    ];
-
     function show() {
-        return view("showTweets", ["allTweets" => $this->tweets]);
+        $tweets = DB::table('tweet')->get();
+        return view("showTweets", ["allTweets" => $tweets]);
     }
 
     function showTweet($id) {
-        if ($id > sizeOf($this->tweets)) {
+        $tweets = DB::table('tweet')->get();
+        if ($id > sizeOf($tweets)) {
             return view("tweetError");
         }
 
-        return view("showTweets", ["allTweets" => [$this->tweets[$id]]]);
+        return view("showTweets", ["allTweets" => [$tweets[$id]]]);
+    }
+
+    function addTweet(Request $request){
+        DB::insert("INSERT INTO tweet (author, content) VALUES ('$request->author', '$request->content')");
+        $tweets = DB::table('tweet')->get();
+        return view("showTweets", ["allTweets" => $tweets]);
+    }
+
+    function deleteTweet(Request $request) {
+        DB::delete("DELETE FROM tweet WHERE id=$request->id");
+        $tweets = DB::table('tweet')->get();
+        return view("showTweets", ["allTweets" => $tweets]);
     }
 }
+
+
